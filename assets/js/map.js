@@ -292,14 +292,18 @@ function onMapClick(e) {
             //});
        
          //change list up here
-                    const button = document.getElementById('filtrar');
+                    /*const button = document.getElementById('filtrar');
             button.addEventListener('click', function() {
+                this.disabled = true;
                 var lista_copia = JSON.parse(JSON.stringify(lista_ord));
                 console.log(lista_copia);
                 lista_copia = update_embalses_dibujados_filtro(radius, lista_copia);
                 limpiar_embalses(lista_markers_antiguos);
                 lista_markers_antiguos = update_embalses_dibujados(radius/100000, lista_copia);
-            })
+                setTimeout(() => {
+                    this.disabled = false;
+                }, 5000);
+            })*/
 });
     
   // Create a new marker at the clicked coordinates and add it to the map
@@ -311,14 +315,18 @@ function onMapClick(e) {
     })        .catch(error =>{
                 console.log(error);
             });
-            /**const button = document.getElementById('filtrar');
+            /*const button = document.getElementById('filtrar');
         button.addEventListener('click', function() {
+            this.disabled = true;
             var lista_copia = JSON.parse(JSON.stringify(lista_ord));
             console.log(lista_copia);
             lista_copia = update_embalses_dibujados_filtro(radius, lista_copia);
             limpiar_embalses(lista_markers_antiguos);
             lista_markers_antiguos = update_embalses_dibujados(radius/100000, lista_copia);
-        })**/
+            setTimeout(() => {
+                this.disabled = false;
+            }, 5000);
+        })*/
     marker = L.marker([latlng.lat, latlng.lng]).addTo(map);
 }
 
