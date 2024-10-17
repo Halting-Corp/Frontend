@@ -33,6 +33,62 @@ function get_water_levels(embalse_id) {
 }
 
 
+
+/*function filter_current_water(current_water, lista_embalses) {
+    
+    // TODO TODO TODO
+    
+    var lista_emb_filtrada = [];
+    for (let i = 0; i < lista_embalses.length; i++){
+        if (lista_embalses[i]. == isElectric){
+            lista_emb_filtrada.push(lista_embalses[i])
+        }else{
+                break;
+        }
+    }
+return lista_emb_filtrada;
+}*/
+
+
+function filter_electricity(isElectric, lista_embalses) {
+    var lista_emb_filtrada = [];
+    for (let i = 0; i < lista_embalses.length; i++){
+        if (lista_embalses[i].electricoFlag == isElectric){
+            lista_emb_filtrada.push(lista_embalses[i])
+        }else{
+                break;
+        }
+    }
+return lista_emb_filtrada;
+}
+
+
+function filter_min_cap(min_cap, lista_embalses) {
+    var lista_emb_filtrada = [];
+    for (let i = 0; i < lista_embalses.length; i++){
+        if (lista_embalses[i].aguaTotal > min_cap){
+            lista_emb_filtrada.push(lista_embalses[i])
+        }else{
+                break;
+        }
+    }
+return lista_emb_filtrada;
+}
+
+function filter_max_cap(max_cap, lista_embalses) {
+    var lista_emb_filtrada = [];
+    for (let i = 0; i < lista_embalses.length; i++){
+        if (lista_embalses[i].aguaTotal < max_cap){
+            lista_emb_filtrada.push(lista_embalses[i])
+        }else{
+                break;
+        }
+    }
+return lista_emb_filtrada;
+}
+
+
+
 function filterLocation(radio, lista_embalses){
 var lista_emb_filtrada = [];
 for (let i = 0; i < lista_embalses.length; i++){
@@ -54,17 +110,20 @@ function limpiar_embalses(lista_embalses_antiguos) {
     }
 }
 
-function peticion_data_embalse(id){
-    var embalse;
-    fetch(embalse_data_url)
-        .then(data => {
-        embalse = JSON.parse(data);
-        
-    })
-        .catch(error => {
-            alert("Database error");
-    })
-    return embalse;
+async function peticion_data_embalse(id){
+    
+    var URL_dist = 'https://malackhatonbackend-gueucxcybseva4dd.spaincentral-01.azurewebsites.net/embalse?';
+    
+    URL_dist = URL_dist +"id=" + id;
+    
+    try{
+        const resp = await fetch(URL_dist);
+        var data = await resp.json();
+        console.log(data);
+        return data;
+    }catch(error){
+        console.error('Hubo un problema con la petición Fetch:', error);
+    }
 }
 
 async function peticion_embalses_ordenados(x, y){
@@ -88,7 +147,21 @@ function update_embalses_dibujados(radio, lista_embalses_ord){
        
     
 lista_filtrada = filterLocation(radio, lista_embalses_ord);
+
+var max_cap = document.getElementById("max_cap").value;
+if (max_cap == "") max_cap = 999999;
+var min_cap = document.getElementById("min_cap").value;
+if (min_cap == "") min_cap = 0;
+var current_water = document.getElementById("current_water").value;
+if (current_water == "") current_water = 0;
+var electricity = document.getElementById("is_electric").value;
     
+    
+//lista_filtrada = filter_max_cap(max_cap, lista_filtrada);
+//lista_filtrada = filter_min_cap(min_cap, lista_filtrada);
+//lista_filtrada = filter_electricity(electricity, lista_filtrada);
+    
+//lista_filtrada = filter_current_water();
     
 lista_markers = []
 for(let embalse = 0; embalse < lista_filtrada.length; embalse++){
@@ -102,17 +175,25 @@ for(let embalse = 0; embalse < lista_filtrada.length; embalse++){
     
     marker_embalse.on('click', function (){
         var myModal = new bootstrap.Modal(document.getElementById('modal-1'));
-        document.getElementById('res-name').textContent = lista_filtrada[embalse].name;
+        peticion_data_embalse(lista_filtrada[embalse].id).then(datos =>
+                                                              {
+        document.getElementById('res-name').textContent = datos.name;
         
-        document.getElementById('titular').textContent = lista_filtrada[embalse].titular;
+        document.getElementById('titular').textContent = datos.ccaa;
 
-        document.getElementById('ambito').textContent =               lista_filtrada[embalse].ambito;
+        document.getElementById('ambito').textContent = datos.cauce;
         
-        document.getElementById('provincia').textContent = lista_filtrada[embalse].provincia;
+        document.getElementById('provincia').textContent = datos.provincia;
         
-        document.getElementById('capacidad').textContent = lista_filtrada[embalse].capacidad+" hm3"; // cambiar
+        document.getElementById('capacidad').textContent = datos.aguaTotal+" hm3"; // cambiar
         
-        document.getElementById('electricidad').textContent = lista_filtrada[embalse].electricidad;
+        document.getElementById('electricidad').textContent = datos.electricoFlag? "Si" : "No";
+            
+        }).catch(error =>
+                {
+            console.log(error);
+        });
+        
         
         var water_levels = [];
         water_levels = get_water_levels(lista_filtrada[embalse].id);
@@ -137,15 +218,16 @@ for(let embalse = 0; embalse < lista_filtrada.length; embalse++){
 
 
 
-var global_count = 0;
+let counter = 0;
 // Event Listener
 function onMapClick(e) {
 
-    if (global_count > 5) {
+    counter++;
+    if(counter==5){
+        //document.body.style.overflow = 'hidden';
+        document.getElementById('overlay').style.display = 'block';
         loadHcaptcha();
         // Show the overlay to block interaction
-        document.getElementById('overlay').style.display = 'block';
-        document.body.style.overflow = "hidden";
     }
     
     var lat = 40;
@@ -174,16 +256,15 @@ function onMapClick(e) {
         radius = newRadius;
   // Update the displayed radius value
         document.getElementById('radiusValue').innerText = newRadius/1000;
-         
-            peticion_embalses_ordenados(lat, lng).then(response =>{
-                lista_ord = response;
-                console.log(lista_ord);
+         //TODO
+            //peticion_embalses_ordenados(lat, lng).then(response =>{
+                //lista_ord = response;
                 limpiar_embalses(lista_markers_antiguos);
                 lista_markers_antiguos = update_embalses_dibujados(radius/100000, lista_ord);
-        })
-        .catch(error =>{
-                console.log(error);
-            });
+        //})
+        //.catch(error =>{
+                //console.log(error);
+            //});
        
          //change list up here
 });
@@ -191,7 +272,6 @@ function onMapClick(e) {
   // Create a new marker at the clicked coordinates and add it to the map
     peticion_embalses_ordenados(lat, lng).then(response =>{
     lista_ord = response;
-    console.log(lista_ord);
     limpiar_embalses(lista_markers_antiguos);
     lista_markers_antiguos = update_embalses_dibujados(radius/100000, lista_ord);
     })        .catch(error =>{

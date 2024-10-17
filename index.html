@@ -123,60 +123,53 @@
                             </li>
                         </ul>
                     </div>
-                </nav><!-- Include hCaptcha script -->
-<script src="https://hcaptcha.com/1/api.js" async defer></script>
+                </nav><!-- captcha.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Captcha Integration</title>
+    <script src="https://hcaptcha.com/1/api.js" async defer></script>
+    <script src="captcha.js" defer></script> <!-- Link to the JavaScript file -->
+    <style>
+        /* Optional: Add some CSS styles to enhance the appearance */
+        #overlay {
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background-color: rgba(0, 0, 0, 0.5); 
+            z-index: 1002;
+        }
+        #captchaContainer {
+            display: flex; 
+            justify-content: center; 
+            padding: 20px; 
+            position: relative; 
+            z-index: 1003;
+        }
+        #contentCaptchaWarning {
+            text-align: center; 
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
 
-<!-- Overlay to block interaction -->
-<div id="overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1002;"></div>
+    <!-- Overlay to block interaction -->
+    <div id="overlay"></div>
 
-<!-- Captcha Container -->
-<div id="captchaContainer" style="display: flex; justify-content: center; padding: 20px; position: relative; z-index: 1003;">
-    <!-- This div will hold the hCaptcha widget -->
-</div>
+    <!-- Captcha Container -->
+    <div id="captchaContainer">
+        <!-- This div will hold the hCaptcha widget -->
+    </div>
 
-<!-- Your page content -->
-<div id="contentCaptchaWarning" style="text-align: center; margin-top: 20px;">
-    <h1>¡Bienvenido al buscador de Halting Corp!</h1>
-    <p>Por favor, completa el Captcha.</p>
-</div>
-
-<script>
-    // Function to add hCaptcha to the specific element
-    function loadHcaptcha() {
-        // Create the hCaptcha div
-        const hcaptchaDiv = document.createElement('div');
-        hcaptchaDiv.className = 'h-captcha';
-        hcaptchaDiv.setAttribute('data-sitekey', '1b5c7e6e-8452-4c6c-918e-e7ea08dee9f8'); // Replace with your actual site key
-
-        // Append the hCaptcha div to the target element
-        const captchaContainer = document.getElementById('captchaContainer');
-        captchaContainer.appendChild(hcaptchaDiv);
-
-        // Render hCaptcha
-        hcaptcha.render(hcaptchaDiv, {
-            callback: onCaptchaSuccess // Set callback for hCaptcha success
-        });
-    }
-
-    // Call the function to load hCaptcha when the document is fully loaded
-    /*document.addEventListener('DOMContentLoaded', function() {
-        loadHcaptcha();
-        // Show the overlay to block interaction
-        document.getElementById('overlay').style.display = 'block';
-    });*/
-
-    // Function to handle successful captcha completion
-    // Function to handle successful captcha completion
-    function onCaptchaSuccess() {
-        // Hide the overlay and captcha container to allow interaction
-        document.getElementById('overlay').style.display = 'none';
-        document.getElementById('captchaContainer').style.display = 'none';
-        document.getElementById('contentCaptchaWarning').style.display = 'none';
-        alert("Captcha completed! You can now access the content.");
-    }
-
-</script>
-
+</body>
+</html>
+ 
                 <div class="container-fluid">
                     <div class="d-sm-flex justify-content-between align-items-center mb-4">
                         <h3 class="text-dark mb-0">Mapa interactivo de los embalses en España</h3><a class="btn btn-primary btn-sm d-none d-sm-inline-block" role="button" href="#"><i class="fas fa-download fa-sm text-white-50"></i>&nbsp;Generate Report</a>
@@ -191,7 +184,7 @@
       <div id="map" style="height: 500px;" class="mt-3"></div>
     </div>
   </div>
-</div><div><div id="map" style="height: 500px;"></div>
+</div><input type="number" id="max_cap" placeholder="Capacidad máxima"><input type="number" id="min_cap" placeholder="Capacidad mínima"><input type="number" id="current_water" placeholder="Agua actual"><input type="checkbox" id="is_electric"><div><div id="map" style="height: 500px;"></div>
 <p id="coordinates" class="mt-3"></p></div>
                     <div class="modal fade" role="dialog" tabindex="-1" id="modal-1">
                         <div class="modal-dialog" role="document">
@@ -245,6 +238,7 @@
     <script src="assets/bootstrap/js/bootstrap.min.js"></script>
     <script src="assets/js/chart.min.js"></script>
     <script src="assets/js/bs-init.js"></script>
+    <script src="assets/js/captcha.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="assets/js/map.js"></script>
